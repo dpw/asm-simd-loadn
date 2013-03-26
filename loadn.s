@@ -1,14 +1,14 @@
 .section .rodata
 .balign 16
 .table:
-        .int 0x80808080, 0x80808080, 0x80808080, 0x80808080
-        .int 0x80808000, 0x80808080, 0x80808080, 0x80808080
-        .int 0x80800100, 0x80808080, 0x80808080, 0x80808080
-        .int 0x80020100, 0x80808080, 0x80808080, 0x80808080
-        .int 0x03020100, 0x80808080, 0x80808080, 0x80808080
-        .int 0x03020100, 0x80808004, 0x80808080, 0x80808080
-        .int 0x03020100, 0x80800504, 0x80808080, 0x80808080
-        .int 0x03020100, 0x80060504, 0x80808080, 0x80808080
+        # No entry for len = 0
+        .int 0x80808000, 0x80808080, 0x80808080, 0x80808080 # len = 1
+        .int 0x80800100, 0x80808080, 0x80808080, 0x80808080 # len = 2
+        .int 0x80020100, 0x80808080, 0x80808080, 0x80808080 # len = 3
+        .int 0x03020100, 0x80808080, 0x80808080, 0x80808080 # len = 4
+        .int 0x03020100, 0x80808004, 0x80808080, 0x80808080 # len = 5
+        .int 0x03020100, 0x80800504, 0x80808080, 0x80808080 # len = 6
+        .int 0x03020100, 0x80060504, 0x80808080, 0x80808080 # len = 7
 
 .text
 .globl loadn
@@ -20,9 +20,12 @@ loadn:
 
         # BEGIN INTERESTING CODE
 
+        pxor %xmm6, %xmm6
+        testl %ecx, %ecx
+        jz 1f
+
         # Put the low 3 bits of esi into every byte of xmm5
         movl %esi, %edx
-        pxor %xmm6, %xmm6
         andl $7, %edx
         movd %edx, %xmm5
         pshufb %xmm6, %xmm5
@@ -32,7 +35,7 @@ loadn:
         addl %ecx, %edi
         shll $4, %ecx
         decl %edi
-        paddb .table(%ecx), %xmm5 # Add the right table entry into xmm5
+        paddb (.table-16)(%ecx), %xmm5 # Add the right table entry into xmm5
         andl %eax, %edi # The address of the last byte, rounded down to 8 bytes
         andl %esi, %eax # esi rounded down to 8 bytes
 
@@ -52,6 +55,7 @@ loadn:
         # use the adjusted table entry from xmm5 to move the bytes we want
         # to the start of xmm6.
         pshufb %xmm5, %xmm6
+1:
 
         # END INTERESTING CODE
 
