@@ -12,8 +12,8 @@
         .int 0x03020100, 0x07060504, 0x80808080, 0x80808080 # len = 8
 
 .text
-.globl loadn
-loadn:
+.globl loadn8
+loadn8:
         pushl %esi
         pushl %edi
         movl 12(%esp), %esi
