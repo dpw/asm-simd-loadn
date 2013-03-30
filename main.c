@@ -12,7 +12,7 @@ int main(void)
 	char expect[16];
 
 	for (i = 0; i < 16; i++) {
-		for (len = 0; len <= 7 && i + len <= 16; len++) {
+		for (len = 0; len <= 8 && i + len <= 16; len++) {
 			fprintf(stderr, "Offset %d, length %d ... ", i, len);
 			loadn(data + i, len, dest);
 			memcpy(expect, data + i, len);
